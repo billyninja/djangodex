@@ -149,7 +149,7 @@ Qual é o último pokémon?
 > Pokemon.objects.last()
 
 Cade o Pikachu?
-> Pokemon.objects.get(name="pikachu")
+> Pokemon.objects.get(name__iexact="pikachu")
 
 **Note que**: Algumas operações retornam um objeto, outras retornam um `QuerySet`
 
@@ -197,13 +197,13 @@ E também tem suporte ao `step operator`
 
 ---
 
-# Level 10
+# Level 15
 
 Quero todos os pokémons que podem aprender Solar Beam!
 > Pokemon.objects.filter(moveset__move__name="solar-beam")
 
-Quero todos os pokémons que podem aprender Solar Beam!
-> Pokemon.objects.filter(moveset__move__name="solar-beam")
+Quero todos os pokémons que podem aprender Qqer Beam!
+> Pokemon.objects.filter(moveset__move__name__endswith="-beam")
 
 E qual deles tem Special mais alto?
 > Pokemon.objects.filter(moveset__move__name="solar-beam").order_by("-stat_special_attack")[0]

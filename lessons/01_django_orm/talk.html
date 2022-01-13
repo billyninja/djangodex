@@ -1181,7 +1181,7 @@ Pra mim é um dos grandes atrativos do Django, é um ORM muito maduro e poderoso
 </blockquote>
 <p>Cade o Pikachu?</p>
 <blockquote>
-<p>Pokemon.objects.get(name=&rdquo;pikachu&rdquo;)</p>
+<p>Pokemon.objects.get(name__iexact=&rdquo;pikachu&rdquo;)</p>
 </blockquote>
 <p><strong>Note que</strong>: Algumas operações retornam um objeto, outras retornam um <code>QuerySet</code></p>
 <hr />
@@ -1225,14 +1225,14 @@ Pokemon.objects.all()[:10]</p>
 <p>Pokemon.objects.all()[::2]</p>
 </blockquote>
 <hr />
-<h1 id="level-10_1">Level 10<a class="headerlink" href="#level-10_1" title="Permanent link"></a></h1>
+<h1 id="level-15">Level 15<a class="headerlink" href="#level-15" title="Permanent link"></a></h1>
 <p>Quero todos os pokémons que podem aprender Solar Beam!</p>
 <blockquote>
 <p>Pokemon.objects.filter(moveset__move__name=&rdquo;solar-beam&rdquo;)</p>
 </blockquote>
-<p>Quero todos os pokémons que podem aprender Solar Beam!</p>
+<p>Quero todos os pokémons que podem aprender Qqer Beam!</p>
 <blockquote>
-<p>Pokemon.objects.filter(moveset__move__name=&rdquo;solar-beam&rdquo;)</p>
+<p>Pokemon.objects.filter(moveset__move__name__endswith=&rdquo;-beam&rdquo;)</p>
 </blockquote>
 <p>E qual deles tem Special mais alto?</p>
 <blockquote>
@@ -1243,7 +1243,7 @@ Pokemon.objects.all()[:10]</p>
 <p>Pokemon.objects.filter(moveset__move__name=&rdquo;solar-beam&rdquo;, number__lte=143).order_by(&ldquo;-stat_special_attack&rdquo;)</p>
 </blockquote>
 <hr />
-<h1 id="level-15">Level 15<a class="headerlink" href="#level-15" title="Permanent link"></a></h1>
+<h1 id="level-15_1">Level 15<a class="headerlink" href="#level-15_1" title="Permanent link"></a></h1>
 <p>Trazendo valores customizados (diferentes de uma instância da classe).</p>
 <blockquote>
 <p>Pokemon.objects.all().values(&lsquo;name&rsquo;, &lsquo;type_1&rsquo;, &lsquo;type_2&rsquo;)</p>
