@@ -1,19 +1,26 @@
 from django.db import models
 from .const import (
-    GENERATION_CHOICES,
-    TYPE_CHOICES,
-    MOVE_DAMAGE_CLASS_CHOICES,
-    MOVE_TARGET_CHOICES,
+    Generation,
+    Type,
+    MoveDamageClass,
+    MoveTarget,
 )
 
 
 class Pokemon(models.Model):
     number = models.PositiveSmallIntegerField(primary_key=True, unique=True)
     name = models.CharField(max_length=32)
-    gen_intruduced = models.PositiveSmallIntegerField(choices=GENERATION_CHOICES)
+    gen_intruduced = models.PositiveSmallIntegerField(choices=Generation.choices())
 
-    type_1 = models.PositiveSmallIntegerField(choices=TYPE_CHOICES)
-    type_2 = models.PositiveSmallIntegerField(choices=TYPE_CHOICES, null=True)
+    type_1 = models.PositiveSmallIntegerField(choices=Type.choices())
+    type_2 = models.PositiveSmallIntegerField(choices=Type.choices(), null=True)
+
+    stat_hp = models.PositiveSmallIntegerField(default=1)
+    stat_attack = models.PositiveSmallIntegerField(default=1)
+    stat_defense = models.PositiveSmallIntegerField(default=1)
+    stat_special_attack = models.PositiveSmallIntegerField(default=1)
+    stat_special_defense = models.PositiveSmallIntegerField(default=1)
+    stat_speed = models.PositiveSmallIntegerField(default=1)
 
     @property
     def types_display(self):
@@ -28,24 +35,23 @@ class Pokemon(models.Model):
 
 
 class Move(models.Model):
-    name = models.CharField(max_length=32)
-    move_type = models.PositiveSmallIntegerField(choices=TYPE_CHOICES)
-    target = models.PositiveSmallIntegerField(choices=MOVE_TARGET_CHOICES)
-    damage_class = models.PositiveSmallIntegerField(choices=MOVE_DAMAGE_CLASS_CHOICES)
+    name = models.CharField(max_length=32, unique=True)
+    move_type = models.PositiveSmallIntegerField(choices=Type.choices())
+    target = models.PositiveSmallIntegerField(choices=MoveTarget.choices())
+    damage_class = models.PositiveSmallIntegerField(choices=MoveDamageClass.choices())
     description = models.CharField(max_length=512)
     short_description = models.CharField(max_length=128)
 
     def __str__(self):
-        return f"{self.name} ({self.type})"
+        return f"{self.name} ({self.get_move_type_display()})"
 
     def __repr__(self):
         return f"<Move: {self}>"
 
 
 class PokemonMove(models.Model):
-    pokemon = models.ForeignKey("kbase.Pokemon", on_delete=models.CASCADE)
+    pokemon = models.ForeignKey("kbase.Pokemon", on_delete=models.CASCADE, related_name="moveset")
     move = models.ForeignKey("kbase.Move", on_delete=models.CASCADE)
-    models.PositiveSmallIntegerField(choices=GENERATION_CHOICES)
 
     class Meta:
         unique_together = ["pokemon", "move"]
