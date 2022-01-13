@@ -42,6 +42,11 @@ class Move(models.Model):
     description = models.CharField(max_length=512)
     short_description = models.CharField(max_length=128)
 
+    accuracy = models.PositiveSmallIntegerField(null=True)
+    power = models.PositiveSmallIntegerField(null=True)
+    pp = models.PositiveSmallIntegerField(null=True)
+    priority = models.SmallIntegerField(null=True)
+
     def __str__(self):
         return f"{self.name} ({self.get_move_type_display()})"
 

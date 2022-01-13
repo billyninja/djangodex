@@ -1063,7 +1063,11 @@ body .markdown-body
 .highlight .vi{color:teal}
 .highlight .il{color:#009999}
 .highlight .gc{color:#999;background-color:#EAF2F5}
-</style><title>sketch</title></head><body><article class="markdown-body"><h1 id="o-que-e-um-orm">O que é um ORM<a class="headerlink" href="#o-que-e-um-orm" title="Permanent link"></a></h1>
+</style><title>talk</title></head><body><article class="markdown-body"><h1 id="toy-project-djangodex">Toy Project: DjangoDex<a class="headerlink" href="#toy-project-djangodex" title="Permanent link"></a></h1>
+<p>Criei um <a href="https://github.com/billyninja/djangodex">projetinho</a> para criar exemplos pra essa apresentação, e quem sabe apresentação futuras.</p>
+<p>A ideia é consumir a <a href="https://pokeapi.co/">PokéAPI</a> para trazer dados de Pokémon e criar uma app em Django para explorar esses dados.</p>
+<p>Obs: A PokéAPI também é feita em Django e <a href="https://github.com/PokeAPI/pokeapi">está no GitHub</a>, claro.</p>
+<h1 id="o-que-e-um-orm">O que é um ORM<a class="headerlink" href="#o-que-e-um-orm" title="Permanent link"></a></h1>
 <p>É uma sigla para <em>Object–relational mapping</em></p>
 <p>Tenta mapear um sistema relacional para um sistema orientado a objetos.</p>
 <p>Ou, de forma mais objetiva: é uma interface super conveniente ao banco de dados, que não só te dá acesso ao banco, como mapeia as entidades do esquema-relacional em objetos da linguagem de programação.</p>
@@ -1108,6 +1112,10 @@ Pra mim é um dos grandes atrativos do Django, é um ORM muito maduro e poderoso
 </li>
 <li>Podemos relacionar os models, criando assim relacionamentos de chaves-estrangeiras no banco</li>
 </ul>
+<blockquote>
+<p>python manage.py graph_models kbase -o kbase_er.jpeg</p>
+</blockquote>
+<p><img alt="ER Diagram" src="/home/joaoedu/projects/djangodex/kbase_er.jpeg" /></p>
 <hr />
 <h1 id="distincao-model-x-instance">Distinção model x instance<a class="headerlink" href="#distincao-model-x-instance" title="Permanent link"></a></h1>
 <p>A mesma de classe x objeto</p>
@@ -1152,6 +1160,8 @@ Pra mim é um dos grandes atrativos do Django, é um ORM muito maduro e poderoso
 
 <hr />
 <h1 id="mudando-o-mindset">Mudando o <em>mindset</em><a class="headerlink" href="#mudando-o-mindset" title="Permanent link"></a></h1>
+<p>Ter uma boa fluência no ORM é muito importante, pois acaba sendo uma forma muito rápida de investigar ou até remediar problemas em prod.</p>
+<p>Quando se está desenvolvendo algo no Django, sempre tenha o shell_plus aberto, explore, experimente as queries antes de coloca-las no código.</p>
 <hr />
 <h1 id="level-01">Level 01<a class="headerlink" href="#level-01" title="Permanent link"></a></h1>
 <p>Quero todos os pokémons!</p>
@@ -1198,7 +1208,7 @@ Pra mim é um dos grandes atrativos do Django, é um ORM muito maduro e poderoso
 <blockquote>
 <p>Pokemon.objects.filter(type_1=Type.GHOST.value).update(type_1=Type.FAIRY.value)</p>
 </blockquote>
-<p>Você também pode fazer &ldquo;slicing&rdquo; em um QuerySet</p>
+<p>Você também pode fazer &ldquo;slicing&rdquo; em um QuerySet (é a forma de implementar LIMIT/OFFSET)</p>
 <blockquote>
 <p>Pokemon.objects.all()[6:9]
 ou
@@ -1207,6 +1217,10 @@ ou
 Pokemon.objects.all()[:10]</p>
 </blockquote>
 <p><strong>(Mas não pode usar indices negativos!)</strong></p>
+<p>E também tem suporte ao <code>step operator</code></p>
+<blockquote>
+<p>Pokemon.objects.all()[::2]</p>
+</blockquote>
 <hr />
 <h1 id="level-10_1">Level 10<a class="headerlink" href="#level-10_1" title="Permanent link"></a></h1>
 <p>Quero todos os pokémons que podem aprender Solar Beam!</p>
@@ -1224,6 +1238,14 @@ Pokemon.objects.all()[:10]</p>
 <p>Tirando os Pokemons super-raros.</p>
 <blockquote>
 <p>Pokemon.objects.filter(moveset__move__name=&rdquo;solar-beam&rdquo;, number__lte=143).order_by(&ldquo;-stat_special_attack&rdquo;)</p>
+</blockquote>
+<hr />
+<h1 id="level-15">Level 15<a class="headerlink" href="#level-15" title="Permanent link"></a></h1>
+<p>Trazendo valores customizados (diferentes de uma instância da classe).</p>
+<blockquote>
+<p>Pokemon.objects.all().values(&lsquo;name&rsquo;, &lsquo;type_1&rsquo;, &lsquo;type_2&rsquo;)</p>
+<p>Pokemon.objects.all().values_list(&lsquo;name&rsquo;, &lsquo;type_1&rsquo;, &lsquo;type_2&rsquo;)</p>
+<p>Pokemon.objects.all().values_list(&lsquo;name&rsquo;, flat=True)</p>
 </blockquote>
 <hr />
 <h1 id="level-20">Level 20<a class="headerlink" href="#level-20" title="Permanent link"></a></h1>
@@ -1261,7 +1283,7 @@ Pokemon.objects.all()[:10]</p>
 <span class="p">)</span>
 </pre></div>
 
-<h4 id="limitacaozinha-boba">! Limitaçãozinha boba !<a class="headerlink" href="#limitacaozinha-boba" title="Permanent link"></a></h4>
+<h4 id="i-wild-limitacaozinha-curiosa-appears">! <em>I wild limitaçãozinha curiosa appears</em> !<a class="headerlink" href="#i-wild-limitacaozinha-curiosa-appears" title="Permanent link"></a></h4>
 <p>Essa operação seria equivalente à acima, mas ela não é possível devido a restrições da expressividade do python (e a forma que o ORM tenta tirar proveito dela)</p>
 <div class="highlight"><pre><span class="n">Pokemon</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
     <span class="n">stat_speed</span><span class="o">=</span><span class="n">F</span><span class="p">(</span><span class="s">&quot;stat_defense&quot;</span><span class="p">),</span>
@@ -1271,6 +1293,22 @@ Pokemon.objects.all()[:10]</p>
 <span class="p">)</span>
 </pre></div>
 
+<h1 id="level-30">Level 30<a class="headerlink" href="#level-30" title="Permanent link"></a></h1>
+<p>AGREGACOES SIMPLES</p>
+<h1 id="level-35">Level 35<a class="headerlink" href="#level-35" title="Permanent link"></a></h1>
+<p>ANNOTATE</p>
+<h1 id="level-40">Level 40<a class="headerlink" href="#level-40" title="Permanent link"></a></h1>
+<div class="highlight"><pre><span class="n">Pokemon</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span>
+    <span class="n">desired_moves</span><span class="o">=</span><span class="n">PokemonMove</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="n">pokemon_id</span><span class="o">=</span><span class="n">OuterRef</span><span class="p">(</span><span class="s">&quot;number&quot;</span><span class="p">),</span>
+            <span class="n">move__move_type</span><span class="o">=</span><span class="n">Type</span><span class="o">.</span><span class="n">ICE</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">move__accuracy</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+            <span class="n">move__priority</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">values_list</span><span class="p">(</span><span class="s">&quot;move__name&quot;</span><span class="p">,</span> <span class="n">flat</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">stat_speed__gt</span><span class="o">=</span><span class="mi">80</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">(</span><span class="s">&quot;name&quot;</span><span class="p">,</span> <span class="s">&quot;desired_moves&quot;</span><span class="p">)</span>
+</pre></div>
+
+<hr />
 <h1 id="common-pitfalls">Common pitfalls<a class="headerlink" href="#common-pitfalls" title="Permanent link"></a></h1>
 <pre><code>lazy access
 

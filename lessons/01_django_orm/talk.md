@@ -1,3 +1,12 @@
+# Toy Project: DjangoDex
+
+Criei um [projetinho](https://github.com/billyninja/djangodex) para criar exemplos pra essa apresentação, e quem sabe apresentação futuras.
+
+A ideia é consumir a [PokéAPI](https://pokeapi.co/) para trazer dados de Pokémon e criar uma app em Django para explorar esses dados.
+
+Obs: A PokéAPI também é feita em Django e [está no GitHub](https://github.com/PokeAPI/pokeapi), claro.
+
+
 # O que é um ORM
 
 É uma sigla para *Object–relational mapping*
@@ -61,6 +70,10 @@ Pra mim é um dos grandes atrativos do Django, é um ORM muito maduro e poderoso
     - através das *migrations*, que é um tópico pra outro dia
 - Podemos relacionar os models, criando assim relacionamentos de chaves-estrangeiras no banco
 
+> python manage.py graph_models kbase -o kbase_er.jpeg
+
+![ER Diagram](../../kbase_er.jpeg)
+
 ---
 
 # Distinção model x instance
@@ -113,6 +126,10 @@ Pokemon.objects.first_gen().all()
 ---
 # Mudando o *mindset*
 
+Ter uma boa fluência no ORM é muito importante, pois acaba sendo uma forma muito rápida de investigar ou até remediar problemas em prod.
+
+Quando se está desenvolvendo algo no Django, sempre tenha o shell_plus aberto, explore, experimente as queries antes de coloca-las no código.
+
 ---
 
 # Level 01
@@ -158,7 +175,7 @@ Quero os pokémons de Fogo, que não são Charmander (e suas evoluções)
 Quero que os fantasmas virem fadas!
 > Pokemon.objects.filter(type_1=Type.GHOST.value).update(type_1=Type.FAIRY.value)
 
-Você também pode fazer "slicing" em um QuerySet
+Você também pode fazer "slicing" em um QuerySet (é a forma de implementar LIMIT/OFFSET)
 
 >Pokemon.objects.all()[6:9]
 ou
@@ -167,6 +184,11 @@ ou
 >Pokemon.objects.all()[:10]
 
 **(Mas não pode usar indices negativos!)**
+
+E também tem suporte ao `step operator`
+
+>Pokemon.objects.all()[::2]
+
 
 ---
 
@@ -183,6 +205,18 @@ E qual deles tem Special mais alto?
 
 Tirando os Pokemons super-raros.
 > Pokemon.objects.filter(moveset__move__name="solar-beam", number__lte=143).order_by("-stat_special_attack")
+
+---
+
+# Level 15
+
+Trazendo valores customizados (diferentes de uma instância da classe).
+
+> Pokemon.objects.all().values('name', 'type_1', 'type_2')
+
+> Pokemon.objects.all().values_list('name', 'type_1', 'type_2')
+
+> Pokemon.objects.all().values_list('name', flat=True)
 
 ---
 
@@ -228,7 +262,7 @@ Pokemon.objects.filter(
 )
 ```
 
-#### ! Limitaçãozinha boba !
+#### ! *I wild limitaçãozinha curiosa appears* !
 Essa operação seria equivalente à acima, mas ela não é possível devido a restrições da expressividade do python (e a forma que o ORM tenta tirar proveito dela)
 
 ```python
@@ -240,6 +274,29 @@ Pokemon.objects.filter(
 )
 ```
 
+# Level 30
+
+AGREGACOES SIMPLES
+
+# Level 35
+
+ANNOTATE
+
+# Level 40
+
+```python
+
+Pokemon.objects.annotate(
+    desired_moves=PokemonMove.objects.filter(
+            pokemon_id=OuterRef("number"),
+            move__move_type=Type.ICE.value,
+            move__accuracy=100,
+            move__priority=0,
+        ).values_list("move__name", flat=True)
+).filter(stat_speed__gt=80).values("name", "desired_moves")
+```
+
+---
 
 
 # Common pitfalls
