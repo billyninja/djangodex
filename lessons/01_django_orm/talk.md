@@ -33,7 +33,7 @@ Mas ele não infere muito mais que isso, **ainda bem!**(É sempre bom ter interf
 # A vida SEM um ORM
 
 ```python
-result = cursor.execute("SELECT * FROM kbase_pokemonspecie")`
+result = cursor.execute("SELECT * FROM kbase_pokemon")`
 
 ("number", "name", type, introduced_gen, height, weight,)
 [
@@ -49,7 +49,7 @@ result = cursor.execute("SELECT * FROM kbase_pokemonspecie")`
 # A vida com um ORM
 
 ```python
-PokemonSpecie.objects.all()
+Pokemon.objects.all()
 ```
 `[<#1 Bulbassaur: grass>, <#2 Ivyssaur: grass>, <#3 Venossaur: grass>]`
 
@@ -262,7 +262,7 @@ Pokemóns com todos os stats iguais:
 Pokemon.objects.filter(
     stat_attack=F("stat_defense"),
     stat_defense=F("stat_special_attack"),
-    stat_special_attack=F("stat_special_defense")
+    stat_special_attack=F("stat_special_defense"),
     stat_special_defense=F("stat_speed")
 )
 ```
