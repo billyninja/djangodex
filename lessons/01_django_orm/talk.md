@@ -6,6 +6,7 @@ A ideia é consumir a [PokéAPI](https://pokeapi.co/) para trazer dados de Poké
 
 Obs: A PokéAPI também é feita em Django e [está no GitHub](https://github.com/PokeAPI/pokeapi), claro.
 
+---
 
 # O que é um ORM
 
@@ -26,6 +27,10 @@ Uma interface básica como o [psychopg2](https://pypi.org/project/psycopg2/) vai
 Mas ele não infere muito mais que isso, **ainda bem!**(É sempre bom ter interfaces em níveis mais baixos para que abstrações de níveis mais alto possam ser construídas em cima)
 
 **[RAW SQL]** -> Lista de Tuplas com seus valores
+
+---
+
+# A vida SEM um ORM
 
 ```python
 result = cursor.execute("SELECT * FROM kbase_pokemonspecie")`
@@ -276,36 +281,65 @@ Pokemon.objects.filter(
 
 # Level 30
 
-AGREGACOES SIMPLES
+>Pokemon.objects.all().aggregate(avg_hp=Avg('stat_hp'))
+
+>Pokemon.objects.aggregate(diff=Max('stat_hp', output_field=FloatField()) - Avg('stat_hp'))
+
 
 # Level 35
 
-ANNOTATE
+Annotate
+
+```python
+Pokemon.objects.annotate(
+    summed_stats=F("stat_attack")
+    + F("stat_defense")
+    + F("stat_speed")
+    + F("stat_special_attack")
+    + F("stat_special_defense")
+).order_by("-summed_stats").values("name", "summed_stats")
+```
+
+```python
+Pokemon.objects.annotate(
+    summed_stats=F("stat_attack")
+    + F("stat_defense")
+    + F("stat_speed")
+    + F("stat_special_attack")
+    + F("stat_special_defense")
+).filter(summed_stats__gt=420).values("name", "summed_stats").order_by("-summed_stats")
+```
+
+---
 
 # Level 40
 
-```python
+Subqueries com anotações
 
-Pokemon.objects.annotate(
-    desired_moves=PokemonMove.objects.filter(
-            pokemon_id=OuterRef("number"),
-            move__move_type=Type.ICE.value,
-            move__accuracy=100,
-            move__priority=0,
-        ).values_list("move__name", flat=True)
-).filter(stat_speed__gt=80).values("name", "desired_moves")
+```python
+subq = PokemonMove.objects.filter(
+    pokemon_id=OuterRef("number"),
+    move__accuracy=100,
+    move__power__gt=115,
+    move__priority=0,
+).values_list("move__name", flat=True)
+
+res = Pokemon.objects.annotate(
+    summed_stat=F("stat_attack")
+    + F("stat_defense")
+    + F("stat_speed")
+    + F("stat_special_attack")
+    + F("stat_special_defense"),
+    desired_moves=subq
+).filter(stat_speed__gt=80, desired_moves__isnull=False).values("name", "desired_moves")
 ```
+
+Esse é um bom exemplo para ver o funcionamento lazy-loading e o porquê dele.
+
 
 ---
 
 
 # Common pitfalls
-    lazy access
 
-        db access time
-        file access time
-        dict access time
-
-        Mas não é só latencia, throughput(vazão) em um banco tambem é mais delicado, assumindo que é um recurso compartilhado com N outros clientes.
-
-    loose values traversing
+(Não deu tempo, então é só falar com a boca)

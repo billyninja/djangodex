@@ -1067,6 +1067,7 @@ body .markdown-body
 <p>Criei um <a href="https://github.com/billyninja/djangodex">projetinho</a> para criar exemplos pra essa apresentação, e quem sabe apresentação futuras.</p>
 <p>A ideia é consumir a <a href="https://pokeapi.co/">PokéAPI</a> para trazer dados de Pokémon e criar uma app em Django para explorar esses dados.</p>
 <p>Obs: A PokéAPI também é feita em Django e <a href="https://github.com/PokeAPI/pokeapi">está no GitHub</a>, claro.</p>
+<hr />
 <h1 id="o-que-e-um-orm">O que é um ORM<a class="headerlink" href="#o-que-e-um-orm" title="Permanent link"></a></h1>
 <p>É uma sigla para <em>Object–relational mapping</em></p>
 <p>Tenta mapear um sistema relacional para um sistema orientado a objetos.</p>
@@ -1077,6 +1078,8 @@ body .markdown-body
 <p>Uma interface básica como o <a href="https://pypi.org/project/psycopg2/">psychopg2</a> vai te fornecer métodos para: conectar ao banco, realizar queries e transações, e ainda te proteger SQL injections e outras vulnerabilidades.</p>
 <p>Mas ele não infere muito mais que isso, <strong>ainda bem!</strong>(É sempre bom ter interfaces em níveis mais baixos para que abstrações de níveis mais alto possam ser construídas em cima)</p>
 <p><strong>[RAW SQL]</strong> -&gt; Lista de Tuplas com seus valores</p>
+<hr />
+<h1 id="a-vida-sem-um-orm_1">A vida SEM um ORM<a class="headerlink" href="#a-vida-sem-um-orm_1" title="Permanent link"></a></h1>
 <div class="highlight"><pre><span class="n">result</span> <span class="o">=</span> <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;SELECT * FROM kbase_pokemonspecie&quot;</span><span class="p">)</span><span class="err">`</span>
 
 <span class="p">(</span><span class="s">&quot;number&quot;</span><span class="p">,</span> <span class="s">&quot;name&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">introduced_gen</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">weight</span><span class="p">,)</span>
@@ -1294,29 +1297,51 @@ Pokemon.objects.all()[:10]</p>
 </pre></div>
 
 <h1 id="level-30">Level 30<a class="headerlink" href="#level-30" title="Permanent link"></a></h1>
-<p>AGREGACOES SIMPLES</p>
+<blockquote>
+<p>Pokemon.objects.all().aggregate(avg_hp=Avg(&lsquo;stat_hp&rsquo;))</p>
+<p>Pokemon.objects.aggregate(diff=Max(&lsquo;stat_hp&rsquo;, output_field=FloatField()) - Avg(&lsquo;stat_hp&rsquo;))</p>
+</blockquote>
 <h1 id="level-35">Level 35<a class="headerlink" href="#level-35" title="Permanent link"></a></h1>
-<p>ANNOTATE</p>
-<h1 id="level-40">Level 40<a class="headerlink" href="#level-40" title="Permanent link"></a></h1>
+<p>Annotate</p>
 <div class="highlight"><pre><span class="n">Pokemon</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span>
-    <span class="n">desired_moves</span><span class="o">=</span><span class="n">PokemonMove</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
-            <span class="n">pokemon_id</span><span class="o">=</span><span class="n">OuterRef</span><span class="p">(</span><span class="s">&quot;number&quot;</span><span class="p">),</span>
-            <span class="n">move__move_type</span><span class="o">=</span><span class="n">Type</span><span class="o">.</span><span class="n">ICE</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-            <span class="n">move__accuracy</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
-            <span class="n">move__priority</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-        <span class="p">)</span><span class="o">.</span><span class="n">values_list</span><span class="p">(</span><span class="s">&quot;move__name&quot;</span><span class="p">,</span> <span class="n">flat</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-<span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">stat_speed__gt</span><span class="o">=</span><span class="mi">80</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">(</span><span class="s">&quot;name&quot;</span><span class="p">,</span> <span class="s">&quot;desired_moves&quot;</span><span class="p">)</span>
+    <span class="n">summed_stats</span><span class="o">=</span><span class="n">F</span><span class="p">(</span><span class="s">&quot;stat_attack&quot;</span><span class="p">)</span>
+    <span class="o">+</span> <span class="n">F</span><span class="p">(</span><span class="s">&quot;stat_defense&quot;</span><span class="p">)</span>
+    <span class="o">+</span> <span class="n">F</span><span class="p">(</span><span class="s">&quot;stat_speed&quot;</span><span class="p">)</span>
+    <span class="o">+</span> <span class="n">F</span><span class="p">(</span><span class="s">&quot;stat_special_attack&quot;</span><span class="p">)</span>
+    <span class="o">+</span> <span class="n">F</span><span class="p">(</span><span class="s">&quot;stat_special_defense&quot;</span><span class="p">)</span>
+<span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">&quot;-summed_stats&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">(</span><span class="s">&quot;name&quot;</span><span class="p">,</span> <span class="s">&quot;summed_stats&quot;</span><span class="p">)</span>
+</pre></div>
+
+<div class="highlight"><pre><span class="n">Pokemon</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span>
+    <span class="n">summed_stats</span><span class="o">=</span><span class="n">F</span><span class="p">(</span><span class="s">&quot;stat_attack&quot;</span><span class="p">)</span>
+    <span class="o">+</span> <span class="n">F</span><span class="p">(</span><span class="s">&quot;stat_defense&quot;</span><span class="p">)</span>
+    <span class="o">+</span> <span class="n">F</span><span class="p">(</span><span class="s">&quot;stat_speed&quot;</span><span class="p">)</span>
+    <span class="o">+</span> <span class="n">F</span><span class="p">(</span><span class="s">&quot;stat_special_attack&quot;</span><span class="p">)</span>
+    <span class="o">+</span> <span class="n">F</span><span class="p">(</span><span class="s">&quot;stat_special_defense&quot;</span><span class="p">)</span>
+<span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">summed_stats__gt</span><span class="o">=</span><span class="mi">420</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">(</span><span class="s">&quot;name&quot;</span><span class="p">,</span> <span class="s">&quot;summed_stats&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">&quot;-summed_stats&quot;</span><span class="p">)</span>
 </pre></div>
 
 <hr />
+<h1 id="level-40">Level 40<a class="headerlink" href="#level-40" title="Permanent link"></a></h1>
+<p>Subqueries com anotações</p>
+<div class="highlight"><pre><span class="n">subq</span> <span class="o">=</span> <span class="n">PokemonMove</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+    <span class="n">pokemon_id</span><span class="o">=</span><span class="n">OuterRef</span><span class="p">(</span><span class="s">&quot;number&quot;</span><span class="p">),</span>
+    <span class="n">move__accuracy</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+    <span class="n">move__power__gt</span><span class="o">=</span><span class="mi">115</span><span class="p">,</span>
+    <span class="n">move__priority</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+<span class="p">)</span><span class="o">.</span><span class="n">values_list</span><span class="p">(</span><span class="s">&quot;move__name&quot;</span><span class="p">,</span> <span class="n">flat</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="n">res</span> <span class="o">=</span> <span class="n">Pokemon</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span>
+    <span class="n">summed_stat</span><span class="o">=</span><span class="n">F</span><span class="p">(</span><span class="s">&quot;stat_attack&quot;</span><span class="p">)</span>
+    <span class="o">+</span> <span class="n">F</span><span class="p">(</span><span class="s">&quot;stat_defense&quot;</span><span class="p">)</span>
+    <span class="o">+</span> <span class="n">F</span><span class="p">(</span><span class="s">&quot;stat_speed&quot;</span><span class="p">)</span>
+    <span class="o">+</span> <span class="n">F</span><span class="p">(</span><span class="s">&quot;stat_special_attack&quot;</span><span class="p">)</span>
+    <span class="o">+</span> <span class="n">F</span><span class="p">(</span><span class="s">&quot;stat_special_defense&quot;</span><span class="p">),</span>
+    <span class="n">desired_moves</span><span class="o">=</span><span class="n">subq</span>
+<span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">stat_speed__gt</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span> <span class="n">desired_moves__isnull</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">(</span><span class="s">&quot;name&quot;</span><span class="p">,</span> <span class="s">&quot;desired_moves&quot;</span><span class="p">)</span>
+</pre></div>
+
+<p>Esse é um bom exemplo para ver o funcionamento lazy-loading e o porquê dele.</p>
+<hr />
 <h1 id="common-pitfalls">Common pitfalls<a class="headerlink" href="#common-pitfalls" title="Permanent link"></a></h1>
-<pre><code>lazy access
-
-    db access time
-    file access time
-    dict access time
-
-    Mas não é só latencia, throughput(vazão) em um banco tambem é mais delicado, assumindo que é um recurso compartilhado com N outros clientes.
-
-loose values traversing
-</code></pre></article></body></html>
+<p>(Não deu tempo, então é só falar com a boca)</p></article></body></html>
