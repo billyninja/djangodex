@@ -39,8 +39,8 @@ class Move(models.Model):
     move_type = models.PositiveSmallIntegerField(choices=Type.choices())
     target = models.PositiveSmallIntegerField(choices=MoveTarget.choices())
     damage_class = models.PositiveSmallIntegerField(choices=MoveDamageClass.choices())
-    description = models.CharField(max_length=1024)
-    short_description = models.CharField(max_length=128)
+    description = models.TextField()
+    short_description = models.CharField(max_length=256)
 
     accuracy = models.PositiveSmallIntegerField(null=True)
     power = models.PositiveSmallIntegerField(null=True)
