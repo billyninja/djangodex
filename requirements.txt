@@ -2,3 +2,4 @@ Django==3.2.11
 django-extensions==3.1.5
 pygraphviz==1.7
 requests==2.27.1
+ipython==8.0.0

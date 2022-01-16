@@ -39,7 +39,7 @@ class Move(models.Model):
     move_type = models.PositiveSmallIntegerField(choices=Type.choices())
     target = models.PositiveSmallIntegerField(choices=MoveTarget.choices())
     damage_class = models.PositiveSmallIntegerField(choices=MoveDamageClass.choices())
-    description = models.CharField(max_length=512)
+    description = models.CharField(max_length=1024)
     short_description = models.CharField(max_length=128)
 
     accuracy = models.PositiveSmallIntegerField(null=True)
@@ -55,8 +55,16 @@ class Move(models.Model):
 
 
 class PokemonMove(models.Model):
-    pokemon = models.ForeignKey("kbase.Pokemon", on_delete=models.CASCADE, related_name="moveset")
-    move = models.ForeignKey("kbase.Move", on_delete=models.CASCADE)
+    pokemon = models.ForeignKey(
+        "kbase.Pokemon",
+        on_delete=models.CASCADE,
+        related_name="moveset"
+    )
+    move = models.ForeignKey(
+        "kbase.Move",
+        on_delete=models.CASCADE,
+        related_name="users"
+    )
 
     class Meta:
         unique_together = ["pokemon", "move"]
