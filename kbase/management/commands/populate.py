@@ -16,7 +16,8 @@ def _as_dict(stat_list):
         out[stat["stat"]["name"]] = stat["base_stat"]
     return out
 
-def populate_1st_gen(ignore_existing=False, collect_moves=False):
+
+def _pokemon_and_moves(ignore_existing=False, collect_moves=False):
 
     moves_cache = {}
 
@@ -34,21 +35,21 @@ def populate_1st_gen(ignore_existing=False, collect_moves=False):
             type2 = _id_from_url(content["types"][1]["type"]["url"])
 
         stats = _as_dict(content["stats"])
-        pokemon, created = Pokemon.objects.get_or_create(
+        pokemon, created = Pokemon.objects.update_or_create(
             number=num,
             name=content["name"],
             gen_intruduced=1,
-            type_1=_id_from_url(content["types"][0]["type"]["url"]),
-            type_2=type2,
+            defauls=dict(
+                type_1=_id_from_url(content["types"][0]["type"]["url"]),
+                type_2=type2,
+                stat_hp=stats.get("hp"),
+                stat_attack=stats.get("attack"),
+                stat_defense=stats.get("defense"),
+                stat_special_attack=stats.get("special-attack"),
+                stat_special_defense=stats.get("special-defense"),
+                stat_speed=stats.get("speed"),
+            ),
         )
-
-        pokemon.stat_hp = stats.get("hp")
-        pokemon.stat_attack = stats.get("attack")
-        pokemon.stat_defense = stats.get("defense")
-        pokemon.stat_special_attack = stats.get("special-attack")
-        pokemon.stat_special_defense = stats.get("special-defense")
-        pokemon.stat_speed = stats.get("speed")
-        pokemon.save()
 
         print(num, pokemon, created)
 
@@ -66,21 +67,20 @@ def populate_1st_gen(ignore_existing=False, collect_moves=False):
             if mov_content["generation"]["name"] != "generation-i":
                 continue
 
-            move, created = Move.objects.get_or_create(
+            move, created = Move.objects.update_or_create(
                 name=mov_content["name"],
-                move_type=_id_from_url(mov_content["type"]["url"]),
-                target=_id_from_url(mov_content["target"]["url"]),
-                damage_class=_id_from_url(mov_content["damage_class"]["url"]),
-                description=mov_content["effect_entries"][0]["effect"],
-                short_description=mov_content["effect_entries"][0]["short_effect"],
+                defaults=dict(
+                    move_type=_id_from_url(mov_content["type"]["url"]),
+                    target=_id_from_url(mov_content["target"]["url"]),
+                    damage_class=_id_from_url(mov_content["damage_class"]["url"]),
+                    description=mov_content["effect_entries"][0]["effect"],
+                    short_description=mov_content["effect_entries"][0]["short_effect"],
+                    accuracy=mov_content["accuracy"],
+                    power=mov_content["power"],
+                    pp=mov_content["pp"],
+                    priority=mov_content["priority"],
+                ),
             )
-
-            move.accuracy = mov_content["accuracy"]
-            move.power = mov_content["power"]
-            move.pp = mov_content["pp"]
-            move.priority = mov_content["priority"]
-
-            move.save()
 
             print("\t", move, created)
             PokemonMove.objects.get_or_create(pokemon=pokemon, move=move)
@@ -88,7 +88,46 @@ def populate_1st_gen(ignore_existing=False, collect_moves=False):
         sleep(0.1)
     print("fin.")
 
-class Command(BaseCommand):
 
+def _locations_and_encounters():
+    resp = requests.get(f"{POKEAPI_BASE_URL}/region/1/")
+    region_content = resp.json()
+    for loc in region_content["locations"]:
+        print(loc["name"])
+        loc_resp = requests.get(loc["url"])
+        loc_content = loc_resp.json()
+        for area in loc_content["areas"]:
+            area_resp = requests.get(area["url"])
+            area_content = area_resp.json()
+            print("\t", area_content["name"])
+            for pkm_encounter in area_content["pokemon_encounters"]:
+                pkm_name = pkm_encounter["pokemon"]["name"]
+                version_details = [
+                    v
+                    for v in pkm_encounter["version_details"]
+                    if v["version"]["name"] == "yellow"
+                ]
+                if not version_details:
+                    continue
+
+                version_details = version_details[0]
+                encounter_details = [
+                    e
+                    for e in version_details["encounter_details"]
+                    if e["method"]["name"]
+                    in {"walk", "old-rod", "good-rod", "super-rod]"}
+                ]
+                if not encounter_details:
+                    continue
+
+                methods = [e["method"]["name"] for e in encounter_details]
+                print("\t\t", pkm_name, version_details["version"]["name"], methods)
+                Pokemon.objects.filter(name=pkm_encounter["pokemon"]["name"])
+
+        print("---")
+
+
+class Command(BaseCommand):
     def handle(self, *args, **options):
-        populate_1st_gen(ignore_existing=False, collect_moves=True)
+        _locations_and_encounters()
+        # _pokemon_and_moves(ignore_existing=False, collect_moves=True)
