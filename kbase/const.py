@@ -1,6 +1,14 @@
 from enum import Enum
 
 
+class Region(Enum):
+    KANTO = 1
+
+    @classmethod
+    def choices(cls):
+        return ((cls.KANTO.value, "kanto"),)
+
+
 class Generation(Enum):
     GEN_1 = 1
     GEN_2 = 2
@@ -14,14 +22,14 @@ class Generation(Enum):
     @classmethod
     def choices(cls):
         return (
-            (cls.GEN_1, "generation-i"),
-            (cls.GEN_2, "generation-ii"),
-            (cls.GEN_3, "generation-iii"),
-            (cls.GEN_4, "generation-iv"),
-            (cls.GEN_5, "generation-v"),
-            (cls.GEN_6, "generation-vi"),
-            (cls.GEN_7, "generation-vii"),
-            (cls.GEN_8, "generation-viii"),
+            (cls.GEN_1.value, "generation-i"),
+            (cls.GEN_2.value, "generation-ii"),
+            (cls.GEN_3.value, "generation-iii"),
+            (cls.GEN_4.value, "generation-iv"),
+            (cls.GEN_5.value, "generation-v"),
+            (cls.GEN_6.value, "generation-vi"),
+            (cls.GEN_7.value, "generation-vii"),
+            (cls.GEN_8.value, "generation-viii"),
         )
 
 
@@ -50,26 +58,26 @@ class Type(Enum):
     @classmethod
     def choices(cls):
         return (
-            (cls.NORMAL, "normal"),
-            (cls.FIGHTING, "fighting"),
-            (cls.FLYING, "flying"),
-            (cls.POISON, "poison"),
-            (cls.GROUND, "ground"),
-            (cls.ROCK, "rock"),
-            (cls.BUG, "bug"),
-            (cls.GHOST, "ghost"),
-            (cls.STEEL, "steel"),
-            (cls.FIRE, "fire"),
-            (cls.WATER, "water"),
-            (cls.GRASS, "grass"),
-            (cls.ELECTRIC, "electric"),
-            (cls.PSYCHIC, "psychic"),
-            (cls.ICE, "ice"),
-            (cls.DRAGON, "dragon"),
-            (cls.DARK, "dark"),
-            (cls.FAIRY, "fairy"),
-            (cls.UNKNOWN, "unknown"),
-            (cls.SHADOW, "shadow"),
+            (cls.NORMAL.value, "normal"),
+            (cls.FIGHTING.value, "fighting"),
+            (cls.FLYING.value, "flying"),
+            (cls.POISON.value, "poison"),
+            (cls.GROUND.value, "ground"),
+            (cls.ROCK.value, "rock"),
+            (cls.BUG.value, "bug"),
+            (cls.GHOST.value, "ghost"),
+            (cls.STEEL.value, "steel"),
+            (cls.FIRE.value, "fire"),
+            (cls.WATER.value, "water"),
+            (cls.GRASS.value, "grass"),
+            (cls.ELECTRIC.value, "electric"),
+            (cls.PSYCHIC.value, "psychic"),
+            (cls.ICE.value, "ice"),
+            (cls.DRAGON.value, "dragon"),
+            (cls.DARK.value, "dark"),
+            (cls.FAIRY.value, "fairy"),
+            (cls.UNKNOWN.value, "unknown"),
+            (cls.SHADOW.value, "shadow"),
         )
 
 
@@ -81,9 +89,9 @@ class MoveDamageClass(Enum):
     @classmethod
     def choices(cls):
         return (
-            (cls.STATUS, "status"),
-            (cls.PHYSICAL, "physical"),
-            (cls.SPECIAL, "special"),
+            (cls.STATUS.value, "status"),
+            (cls.PHYSICAL.value, "physical"),
+            (cls.SPECIAL.value, "special"),
         )
 
 
@@ -107,19 +115,87 @@ class MoveTarget(Enum):
     @classmethod
     def choices(cls):
         return (
-            (cls.SPECIFIC_MOVE, "specific-move",),
-            (cls.SELECTED_POKEMON_ME_FIRST, "selected-pokemon-me-first",),
-            (cls.ALLY, "ally",),
-            (cls.USERS_FIELD, "users-field",),
-            (cls.USER_OR_ALLY, "user-or-ally",),
-            (cls.OPPONENTS_FIELD, "opponents-field",),
-            (cls.USER, "user",),
-            (cls.RANDOM_OPPONENT, "random-opponent",),
-            (cls.ALL_OTHER_POKEMON, "all-other-pokemon",),
-            (cls.SELECTED_POKEMON, "selected-pokemon",),
-            (cls.ALL_OPPONENTS, "all-opponents",),
-            (cls.ENTIRE_FIELD, "entire-field",),
-            (cls.USER_AND_ALLIES, "user-and-allies",),
-            (cls.ALL_POKEMON, "all-pokemon",),
-            (cls.ALL_ALLIES, "all-allies",),
+            (
+                cls.SPECIFIC_MOVE.value,
+                "specific-move",
+            ),
+            (
+                cls.SELECTED_POKEMON_ME_FIRST.value,
+                "selected-pokemon-me-first",
+            ),
+            (
+                cls.ALLY.value,
+                "ally",
+            ),
+            (
+                cls.USERS_FIELD.value,
+                "users-field",
+            ),
+            (
+                cls.USER_OR_ALLY.value,
+                "user-or-ally",
+            ),
+            (
+                cls.OPPONENTS_FIELD.value,
+                "opponents-field",
+            ),
+            (
+                cls.USER.value,
+                "user",
+            ),
+            (
+                cls.RANDOM_OPPONENT.value,
+                "random-opponent",
+            ),
+            (
+                cls.ALL_OTHER_POKEMON.value,
+                "all-other-pokemon",
+            ),
+            (
+                cls.SELECTED_POKEMON.value,
+                "selected-pokemon",
+            ),
+            (
+                cls.ALL_OPPONENTS.value,
+                "all-opponents",
+            ),
+            (
+                cls.ENTIRE_FIELD.value,
+                "entire-field",
+            ),
+            (
+                cls.USER_AND_ALLIES.value,
+                "user-and-allies",
+            ),
+            (
+                cls.ALL_POKEMON.value,
+                "all-pokemon",
+            ),
+            (
+                cls.ALL_ALLIES.value,
+                "all-allies",
+            ),
+        )
+
+
+class EncounterMethods(Enum):
+    WALK = 1
+    SURF = 2
+    FISHING = 3
+
+    @classmethod
+    def choices(cls):
+        return (
+            (
+                cls.WALK.value,
+                "walk",
+            ),
+            (
+                cls.SURF.value,
+                "surf",
+            ),
+            (
+                cls.FISHING.value,
+                "fishing",
+            ),
         )

@@ -1,9 +1,11 @@
 from django.db import models
 from .const import (
+    Region,
     Generation,
     Type,
     MoveDamageClass,
     MoveTarget,
+    EncounterMethods,
 )
 
 
@@ -56,14 +58,10 @@ class Move(models.Model):
 
 class PokemonMove(models.Model):
     pokemon = models.ForeignKey(
-        "kbase.Pokemon",
-        on_delete=models.CASCADE,
-        related_name="moveset"
+        "kbase.Pokemon", on_delete=models.CASCADE, related_name="moveset"
     )
     move = models.ForeignKey(
-        "kbase.Move",
-        on_delete=models.CASCADE,
-        related_name="users"
+        "kbase.Move", on_delete=models.CASCADE, related_name="users"
     )
 
     class Meta:
@@ -74,3 +72,28 @@ class PokemonMove(models.Model):
 
     def __repr__(self):
         return f"<PokemonMove: {self}>"
+
+
+class Location(models.Model):
+    name = models.CharField(max_length=48, unique=True)
+    region = models.PositiveSmallIntegerField(choices=Region.choices())
+
+
+class Area(models.Model):
+    name = models.CharField(max_length=48, unique=True)
+    location = models.ForeignKey(
+        Location,
+        on_delete=models.CASCADE,
+    )
+
+
+class PokemonEncounter(models.Model):
+    area = models.ForeignKey(
+        Area,
+        on_delete=models.CASCADE,
+    )
+    pokemon = models.ForeignKey(
+        Pokemon,
+        on_delete=models.CASCADE,
+    )
+    method = models.PositiveSmallIntegerField(choices=EncounterMethods.choices())
